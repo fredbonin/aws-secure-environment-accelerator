@@ -66,12 +66,12 @@ export class Nfw extends Construct {
     const acceleratorPrefixNoDash = props.acceleratorPrefix.slice(0, -1);
     const logGroupName = `/${prefix}/Nfw`;
 
-    const cwFlowGroup = new LogGroup(this, `${this.nfwName}NFWCWLFlowLogs`, {
+    const cwFlowGroup = new LogGroup(this, `${this.nfwName}NFWCWLFlowLogging`, {
       logGroupName: `/${acceleratorPrefixNoDash}/Nfw/${this.nfwName}/Flow`,
       roleArn: props.logGroupRoleArn,
     });
 
-    const cwAlertGroup = new LogGroup(this, `${this.nfwName}NFWCWLAlertLogs`, {
+    const cwAlertGroup = new LogGroup(this, `${this.nfwName}NFWCWLAlertLogging`, {
       logGroupName: `/${acceleratorPrefixNoDash}/Nfw/${this.nfwName}/Alert`,
       roleArn: props.logGroupRoleArn,
     });
