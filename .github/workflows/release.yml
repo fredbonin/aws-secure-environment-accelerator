@@ -93,7 +93,7 @@ jobs:
           zip -r  ui-build.zip "${OUTPUT_DIR}"
 
           echo ::set-output name=template_name_sea_gui::AWS-SEA-GUI-mockup-DoNotUse-${NUMERIC_RELEASE_SHORT}-alpha.zip
-          echo ::set-output name=template_path_sea_gui::$(realpath "${UI_DIR}/ui-build.zip")
+          echo ::set-output name=template_path_sea_gui::$(realpath "./ui-build.zip")
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
