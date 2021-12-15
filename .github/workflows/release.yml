@@ -77,7 +77,7 @@ jobs:
           pnpx cdk synth --output "${OUTPUT_DIR}" "${INSTALLER_STACK_NAME}"
 
           echo ::set-output name=template_name::${INSTALLER_STACK_NAME}${INSTALLER_STACK_NAME_VERSION}.template.json
-          echo ::set-output name=template_name_code_commit::${INSTALLER_STACK_NAME}${INSTALLER_STACK_NAME_VERSION}.template.json
+          echo ::set-output name=template_name_code_commit::${INSTALLER_STACK_NAME}${INSTALLER_STACK_NAME_VERSION}-CodeCommit.template.json
           echo ::set-output name=template_path::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}.template.json")
           echo ::set-output name=template_path_code_commit::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}-CodeCommit.template.json")
       - name: Create Release
