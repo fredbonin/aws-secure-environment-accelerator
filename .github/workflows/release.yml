@@ -84,16 +84,30 @@ jobs:
         id: build-sea-gui
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UI_DIR: ./src/ui
+          BUILD_DIR: ./src/ui
           NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
           OUTPUT_DIR: build
         run: |
-          cd "${UI_DIR}"
+          cd "${BUILD_DIR}"
           pnpm build:ui
           zip -r  ui-build.zip "${OUTPUT_DIR}"
 
-          echo ::set-output name=template_name_sea_gui::AWS-SEA-GUI-mockup-DoNotUse-${NUMERIC_RELEASE_SHORT}-alpha.zip
-          echo ::set-output name=template_path_sea_gui::$(realpath "./ui-build.zip")
+          echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-${NUMERIC_RELEASE_SHORT}-alpha.zip
+          echo ::set-output name=release-path::$(realpath "./ui-build.zip")
+      - name: Build SEA-Config-Schema project
+        id: build-sea-config-schema
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_DIR: ./src/lib/docs-gen
+          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
+          OUTPUT_DIR: output-docs
+        run: |
+          cd "${BUILD_DIR}"
+          pnpm build
+          zip -r  sea-config-schema-build.zip "${OUTPUT_DIR}"
+
+          echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-${NUMERIC_RELEASE_SHORT}-DRAFT.zip
+          echo ::set-output name=release-path::$(realpath "./sea-config-schema-build.zip")
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -133,8 +147,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.build-sea-gui.outputs.template_path_sea_gui }}
-          asset_name: ${{ steps.build-sea-gui.outputs.template_name_sea_gui }}
+          asset_path: ${{ steps.build-sea-gui.outputs.release-path }}
+          asset_name: ${{ steps.build-sea-gui.outputs.release-asset-name }}
+          asset_content_type: application/json
+      - name: Upload Release Asset - SEA-Config-Schema
+        id: upload-release-asset-sea-config-schema
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.build-sea-config-schema.outputs.release-path }}
+          asset_name: ${{ steps.build-sea-config-schema.outputs.release-asset-name }}
           asset_content_type: application/json
       - name: Get Draft Release Url
         id: release_url
