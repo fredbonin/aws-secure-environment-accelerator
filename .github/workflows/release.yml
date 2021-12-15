@@ -69,15 +69,15 @@ jobs:
           GITHUB_DEFAULT_BRANCH: ${{ steps.format.outputs.branch_name }}
           INSTALLER_STACK_DIR: ./src/installer/cdk
           INSTALLER_STACK_NAME: AcceleratorInstaller
-          INSTALLER_STACK_NAME_VERSION: ${{ steps.format.outputs.numeric_release_short }}
+          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
           OUTPUT_DIR: templates
         run: |
           cd "${INSTALLER_STACK_DIR}"
           pnpm install --frozen-lockfile
           pnpx cdk synth --output "${OUTPUT_DIR}" "${INSTALLER_STACK_NAME}"
 
-          echo ::set-output name=template_name::${INSTALLER_STACK_NAME}${INSTALLER_STACK_NAME_VERSION}.template.json
-          echo ::set-output name=template_name_code_commit::${INSTALLER_STACK_NAME}${INSTALLER_STACK_NAME_VERSION}-CodeCommit.template.json
+          echo ::set-output name=template_name::${INSTALLER_STACK_NAME}${NUMERIC_RELEASE_SHORT}.template.json
+          echo ::set-output name=template_name_code_commit::${INSTALLER_STACK_NAME}${NUMERIC_RELEASE_SHORT}-CodeCommit.template.json
           echo ::set-output name=template_path::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}.template.json")
           echo ::set-output name=template_path_code_commit::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}-CodeCommit.template.json")
       - name: Build SEA-GUI project
