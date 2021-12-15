@@ -133,8 +133,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.build.outputs.template_path_sea_gui }}
-          asset_name: ${{ steps.build.outputs.template_name_sea_gui }}
+          asset_path: ${{ steps.build-sea-gui.outputs.template_path_sea_gui }}
+          asset_name: ${{ steps.build-sea-gui.outputs.template_name_sea_gui }}
           asset_content_type: application/json
       - name: Get Draft Release Url
         id: release_url
