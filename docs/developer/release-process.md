@@ -26,12 +26,6 @@
 
    - once the documentation is generated, add the ZIP file to the release assets, named `AWS-SEA-Documentation-vXXX.zip`
 
-10. Rename the `AcceleratorInstaller.template.json` to `AcceleratorInstaller`XXX`.template.json` replacing XXX with the version number without punctuation (i.e. `AcceleratorInstaller121b.template.json`).
-    - Repeat for `AcceleratorInstaller-CodeCommit.template-vXXX.json`.
-11. Add the Accelerator configuration file schema documentation ZIP to the release assets, named `AWS-SEA-Config-Schema-vXXX-DRAFT.zip`.
-
-12. Add the Accelerator **_Alpha_** GUI ZIP to the release assets, named `AWS-SEA-GUI-mockup-DoNotUse-vXXX-alpha.zip`.
-
 ---
 
 [...Return to Accelerator Table of Contents](../index.md)
