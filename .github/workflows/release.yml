@@ -149,7 +149,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.build-sea-gui.outputs.release-path }}
           asset_name: ${{ steps.build-sea-gui.outputs.release-asset-name }}
-          asset_content_type: application/json
+          asset_content_type: application/zip
       - name: Upload Release Asset - SEA-Config-Schema
         id: upload-release-asset-sea-config-schema
         uses: actions/upload-release-asset@v1
@@ -159,7 +159,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.build-sea-config-schema.outputs.release-path }}
           asset_name: ${{ steps.build-sea-config-schema.outputs.release-asset-name }}
-          asset_content_type: application/json
+          asset_content_type: application/zip
       - name: Get Draft Release Url
         id: release_url
         run: |
