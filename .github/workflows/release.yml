@@ -124,16 +124,16 @@ jobs:
           asset_path: ${{ steps.build.outputs.template_path_code_commit }}
           asset_name: ${{ steps.build.outputs.template_name_code_commit }}
           asset_content_type: application/json
-      - name: Upload Release Asset - SEA-Config-Schema
-        id: upload-release-asset-sea-config-schema
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.build-sea-config-schema.outputs.release-path }}
-          asset_name: ${{ steps.build-sea-config-schema.outputs.release-asset-name }}
-          asset_content_type: application/zip
+#      - name: Upload Release Asset - SEA-Config-Schema
+#        id: upload-release-asset-sea-config-schema
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ${{ steps.build-sea-config-schema.outputs.release-path }}
+#          asset_name: ${{ steps.build-sea-config-schema.outputs.release-asset-name }}
+#          asset_content_type: application/zip
       - name: Get Draft Release Url
         id: release_url
         run: |
@@ -160,7 +160,7 @@ jobs:
         run: |
           npm install -g pnpm@6.2.3
       - name: Build SEA-Config-Schema project
-        id: build-sea-config-schema
+        id: build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_DIR: ./src/lib/docs-gen
@@ -557,7 +557,7 @@ jobs:
   upload-documentation-archive:
     # We don't want to upload artifact to the release if the workflow was dispatched manually
     if: github.event_name != 'workflow_dispatch'
-    needs: [release, documentation, release-sea-gui]
+    needs: [release, documentation, release-sea-gui, build-sea-config-schema]
     name: Upload Documentation Archive to Release Asset
     runs-on: ubuntu-latest
     steps:
