@@ -522,7 +522,7 @@ jobs:
 #          echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ jobs.documentation.steps.setup.outputs.dir }}
+          name: ${{ needs.documentation.outputs.documentation-archive-name }}
       - name: Upload Documentation
         id: upload-documentation
         uses: actions/upload-release-asset@v1
