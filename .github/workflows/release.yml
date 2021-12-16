@@ -590,7 +590,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.download-archive-sea-gui.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  archive.zip "${OUTPUT_DIR}"
@@ -618,7 +618,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.download-archive-sea-config-schema.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  archive.zip "${OUTPUT_DIR}"
