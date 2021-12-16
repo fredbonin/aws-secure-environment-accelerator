@@ -557,6 +557,9 @@ jobs:
         with:
           name: ${{ needs.build-documentation.outputs.documentation-archive-name }}
           path: download-archive-documentation
+      - name: TODO FB DEBUG
+        run: |
+          ls -R
       - name: Documentation - Create Archive
         id: create-archive-documentation
         env:
