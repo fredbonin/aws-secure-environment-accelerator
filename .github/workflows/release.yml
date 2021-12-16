@@ -557,9 +557,6 @@ jobs:
         with:
           name: ${{ needs.build-documentation.outputs.documentation-archive-name }}
           path: download-archive-documentation
-      - name: TODO FB DEBUG
-        run: |
-          ls -R
       - name: Documentation - Create Archive
         id: create-archive-documentation
         env:
@@ -568,7 +565,7 @@ jobs:
           OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
-          zip -r  documentation.zip "${OUTPUT_DIR}"
+          zip -r  documentation.zip *
 
           echo ::set-output name=release-path::$(realpath "./documentation.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
@@ -596,7 +593,7 @@ jobs:
           OUTPUT_DIR: ${{ steps.download-archive-sea-gui.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
-          zip -r  archive.zip "${OUTPUT_DIR}"
+          zip -r  archive.zip *
 
           echo ::set-output name=release-path::$(realpath "./archive.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-v${NUMERIC_RELEASE_SHORT}-alpha.zip
@@ -624,7 +621,7 @@ jobs:
           OUTPUT_DIR: ${{ steps.download-archive-sea-config-schema.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
-          zip -r  archive.zip "${OUTPUT_DIR}"
+          zip -r  archive.zip *
 
           echo ::set-output name=release-path::$(realpath "./archive.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-v${NUMERIC_RELEASE_SHORT}-DRAFT.zip
