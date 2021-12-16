@@ -562,7 +562,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.build-download-archive-documentation.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  documentation.zip "${OUTPUT_DIR}"
