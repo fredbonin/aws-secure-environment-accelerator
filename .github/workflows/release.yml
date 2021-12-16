@@ -499,19 +499,26 @@ jobs:
           name: ${{ steps.setup.outputs.dir }}
           path: ${{ steps.setup.outputs.dir }}/
 
-      - name: Create documentation archive
-        id: archive-documentation
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUILD_DIR: ./src/ui
-          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
-          OUTPUT_DIR: ${{ steps.setup.outputs.dir }}
-        run: |
-          zip -r  documentation.zip "${OUTPUT_DIR}"
-
-          echo ::set-output name=release-path::$(realpath "./documentation.zip")
-          echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
-
+  upload-documentation-archive:
+    needs: release,documentation
+    name: Upload Documentation Archive
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Create documentation archive
+#        id: archive-documentation
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          BUILD_DIR: ./src/ui
+#          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
+#          OUTPUT_DIR: ${{ steps.setup.outputs.dir }}
+#        run: |
+#          zip -r  documentation.zip "${OUTPUT_DIR}"
+#
+#          echo ::set-output name=release-path::$(realpath "./documentation.zip")
+#          echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ jobs.documentation.steps.setup.outputs.dir }}
       - name: Upload Documentation
         id: upload-documentation
         uses: actions/upload-release-asset@v1
@@ -519,7 +526,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ jobs.release.steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.archive-documentation.outputs.release-path }}
-          asset_name: ${{ steps.archive-documentation.outputs.release-asset-name }}
+          asset_path: ${{ jobs.documentation.steps.setup.outputs.dir }}
+          asset_name: testdoc.zip
           asset_content_type: application/zip
-
