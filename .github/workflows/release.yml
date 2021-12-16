@@ -92,20 +92,6 @@ jobs:
           echo ::set-output name=template_name_code_commit::${INSTALLER_STACK_NAME}${NUMERIC_RELEASE_SHORT}-CodeCommit.template.json
           echo ::set-output name=template_path::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}.template.json")
           echo ::set-output name=template_path_code_commit::$(realpath "${OUTPUT_DIR}/${INSTALLER_STACK_NAME}-CodeCommit.template.json")
-      - name: Build SEA-GUI project
-        id: build-sea-gui
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUILD_DIR: ./src/ui
-          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
-          OUTPUT_DIR: build
-        run: |
-          cd "${BUILD_DIR}"
-          pnpm build:ui
-          zip -r  ui-build.zip "${OUTPUT_DIR}"
-
-          echo ::set-output name=release-path::$(realpath "./ui-build.zip")
-          echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-v${NUMERIC_RELEASE_SHORT}-alpha.zip
       - name: Build SEA-Config-Schema project
         id: build-sea-config-schema
         env:
@@ -152,16 +138,6 @@ jobs:
           asset_path: ${{ steps.build.outputs.template_path_code_commit }}
           asset_name: ${{ steps.build.outputs.template_name_code_commit }}
           asset_content_type: application/json
-      - name: Upload Release Asset - SEA-GUI
-        id: upload-release-asset-sea-gui
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.build-sea-gui.outputs.release-path }}
-          asset_name: ${{ steps.build-sea-gui.outputs.release-asset-name }}
-          asset_content_type: application/zip
       - name: Upload Release Asset - SEA-Config-Schema
         id: upload-release-asset-sea-config-schema
         uses: actions/upload-release-asset@v1
@@ -176,6 +152,47 @@ jobs:
         id: release_url
         run: |
           echo "Draft release available at: ${{ steps.create_release.outputs.html_url}}"
+
+  release-sea-gui:
+    name: Create Release for ASEA GUI
+    runs-on: ubuntu-latest
+    outputs:
+      sea-gui-archive-name: ${{ steps.build.outputs.release-asset-name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        env:
+          RUNNER_TEMP: /tmp/runner
+        with:
+          node-version: 14
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm@6.2.3
+      - name: Build SEA-GUI project
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_DIR: ./src/ui
+          OUTPUT_DIR: build
+          BUILD_ASSET_NAME: AWS-SEA-GUI-mockup-DoNotUse-alpha.zip
+        run: |
+          pnpm install --frozen-lockfile
+          cd "${BUILD_DIR}"
+          pnpm build:ui
+          zip -r  ${BUILD_ASSET_NAME} "${OUTPUT_DIR}"
+
+          echo ::set-output name=release-path::$(realpath "./${BUILD_ASSET_NAME}")
+          echo ::set-output name=release-asset-name::${BUILD_ASSET_NAME}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.build.outputs.release-asset-name }}
+          path: ${{ steps.build.outputs.release-path }}
+
   documentation:
     name: Generate Documentation
     runs-on: ubuntu-latest
@@ -514,9 +531,9 @@ jobs:
           path: ${{ steps.setup.outputs.dir }}/
 
   upload-documentation-archive:
-    # We don't want to do a release if the workflow was dispatched manually
+    # We don't want to upload artifact to the release if the workflow was dispatched manually
     if: github.event_name != 'workflow_dispatch'
-    needs: [release, documentation]
+    needs: [release, documentation, release-sea-gui]
     name: Upload Documentation Archive to Release Asset
     runs-on: ubuntu-latest
     steps:
@@ -532,7 +549,6 @@ jobs:
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
           OUTPUT_DIR: ${{ steps.download-documentation-archive.outputs.download-path }}
         run: |
-          ls -R
           zip -r  documentation.zip "${OUTPUT_DIR}"
 
           echo ::set-output name=release-path::$(realpath "./documentation.zip")
@@ -544,8 +560,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-#          asset_path: ${{ needs.documentation.outputs.documentation-archive-name }}
-#          asset_name: testdoc.zip
           asset_path: ${{ steps.archive-documentation.outputs.release-path }}
           asset_name: ${{ steps.archive-documentation.outputs.release-asset-name }}
+          asset_content_type: application/zip
+      - name: Upload Release Asset - SEA-GUI
+        id: upload-release-asset-sea-gui
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.release-asset-url }}
+          asset_path: ${{ steps.build-sea-gui.outputs.release-path }}
+          asset_name: ${{ steps.build-sea-gui.outputs.release-asset-name }}
           asset_content_type: application/zip
