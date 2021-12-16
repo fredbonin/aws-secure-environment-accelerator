@@ -196,6 +196,7 @@ jobs:
           OUTPUT_DIR: build
           BUILD_ASSET_NAME: AWS-SEA-GUI-mockup-DoNotUse-alpha.zip
         run: |
+          pnpm install --frozen-lockfile
           cd "${BUILD_DIR}"
           pnpm build:ui
           zip -r  ${BUILD_ASSET_NAME} "${OUTPUT_DIR}"
