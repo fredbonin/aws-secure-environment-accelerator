@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       generateDocOnly:
-        description: 'Generate documentation only. Changing the value to false will have no impact, the documentation will still be only generated'
+        description: 'Generate documentation only. Unchecking this checkbox will have no impact, the documentation will still be only generated when the workflow is triggered manually.'
         type: boolean
         required: false
         default: 'true'
