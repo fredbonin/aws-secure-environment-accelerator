@@ -107,13 +107,13 @@ jobs:
       - name: Upload Artifact - AcceleratorInstaller-GitHub
         uses: actions/upload-artifact@v2
         with:
-          asset_path: ${{ steps.build.outputs.template_path }}
-          asset_name: ${{ steps.build.outputs.template_name }}
+          path: ${{ steps.build.outputs.template_path }}
+          name: ${{ steps.build.outputs.template_name }}
       - name: Upload Artifact - AcceleratorInstaller-CodeCommit
         uses: actions/upload-artifact@v2
         with:
-          asset_path: ${{ steps.build.outputs.template_path_code_commit }}
-          asset_name: ${{ steps.build.outputs.template_name_code_commit }}
+          path: ${{ steps.build.outputs.template_path_code_commit }}
+          name: ${{ steps.build.outputs.template_name_code_commit }}
       - name: Upload Release Asset - AcceleratorInstaller-GitHub
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
