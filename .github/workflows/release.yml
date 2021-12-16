@@ -104,6 +104,16 @@ jobs:
             ${{ steps.changelog.outputs.changelog }}
           draft: true
           prerelease: false
+      - name: Upload Artifact - AcceleratorInstaller-GitHub
+        uses: actions/upload-artifact@v2
+        with:
+          asset_path: ${{ steps.build.outputs.template_path }}
+          asset_name: ${{ steps.build.outputs.template_name }}
+      - name: Upload Artifact - AcceleratorInstaller-CodeCommit
+        uses: actions/upload-artifact@v2
+        with:
+          asset_path: ${{ steps.build.outputs.template_path_code_commit }}
+          asset_name: ${{ steps.build.outputs.template_name_code_commit }}
       - name: Upload Release Asset - AcceleratorInstaller-GitHub
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -163,7 +173,8 @@ jobs:
 
           echo ::set-output name=release-path::$(realpath "./${OUTPUT_DIR}")
           echo ::set-output name=release-asset-name::${BUILD_ASSET_NAME}
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.build.outputs.release-asset-name }}
           path: ${{ steps.build.outputs.release-path }}
@@ -202,7 +213,8 @@ jobs:
 
           echo ::set-output name=release-path::$(realpath "./${OUTPUT_DIR}")
           echo ::set-output name=release-asset-name::${BUILD_ASSET_NAME}
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.build.outputs.release-asset-name }}
           path: ${{ steps.build.outputs.release-path }}
@@ -539,7 +551,8 @@ jobs:
             --pdf-engine=xelatex
             docs/architectures/pbmm/architecture.md
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.setup.outputs.dir }}
           path: ${{ steps.setup.outputs.dir }}/
