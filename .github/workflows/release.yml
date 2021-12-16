@@ -92,8 +92,8 @@ jobs:
           pnpm build:ui
           zip -r  ui-build.zip "${OUTPUT_DIR}"
 
-          echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-V${NUMERIC_RELEASE_SHORT}-alpha.zip
           echo ::set-output name=release-path::$(realpath "./ui-build.zip")
+          echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-V${NUMERIC_RELEASE_SHORT}-alpha.zip
       - name: Build SEA-Config-Schema project
         id: build-sea-config-schema
         env:
@@ -106,8 +106,8 @@ jobs:
           pnpm build
           zip -r  sea-config-schema-build.zip "${OUTPUT_DIR}"
 
-          echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-V${NUMERIC_RELEASE_SHORT}-DRAFT.zip
           echo ::set-output name=release-path::$(realpath "./sea-config-schema-build.zip")
+          echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-V${NUMERIC_RELEASE_SHORT}-DRAFT.zip
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
