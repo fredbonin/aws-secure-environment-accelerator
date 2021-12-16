@@ -504,7 +504,7 @@ jobs:
           path: ${{ steps.setup.outputs.dir }}/
 
   upload-documentation-archive:
-    needs: release,documentation
+    needs: [release, documentation]
     name: Upload Documentation Archive
     runs-on: ubuntu-latest
     steps:
