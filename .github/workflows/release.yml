@@ -510,15 +510,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
+        id: download-documentation-archive
         with:
           name: ${{ needs.documentation.outputs.documentation-archive-name }}
+          path: .
       - name: Create documentation archive
         id: archive-documentation
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ needs.documentation.outputs.documentation-archive-name }}
+          OUTPUT_DIR: ${{ steps.download-documentation-archive.outputs.download-path }}
         run: |
+          ls -R
           zip -r  documentation.zip "${OUTPUT_DIR}"
 
           echo ::set-output name=release-path::$(realpath "./documentation.zip")
