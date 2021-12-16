@@ -5,10 +5,11 @@ on:
       - 'release/v*'
 jobs:
   release:
-    name: Release
+    name: Create Release
     runs-on: ubuntu-latest
     outputs:
       release-asset-url: ${{ steps.create_release.outputs.upload_url }}
+      numeric-release-short: ${{ steps.format.outputs.numeric_release_short }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -167,7 +168,7 @@ jobs:
         run: |
           echo "Draft release available at: ${{ steps.create_release.outputs.html_url}}"
   documentation:
-    name: Render
+    name: Generate Documentation
     runs-on: ubuntu-latest
     outputs:
       documentation-archive-name: ${{ steps.setup.outputs.dir }}
@@ -505,24 +506,23 @@ jobs:
 
   upload-documentation-archive:
     needs: [release, documentation]
-    name: Upload Documentation Archive
+    name: Upload Documentation Archive to Release Asset
     runs-on: ubuntu-latest
     steps:
-#      - name: Create documentation archive
-#        id: archive-documentation
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          BUILD_DIR: ./src/ui
-#          NUMERIC_RELEASE_SHORT: ${{ steps.format.outputs.numeric_release_short }}
-#          OUTPUT_DIR: ${{ steps.setup.outputs.dir }}
-#        run: |
-#          zip -r  documentation.zip "${OUTPUT_DIR}"
-#
-#          echo ::set-output name=release-path::$(realpath "./documentation.zip")
-#          echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
       - uses: actions/download-artifact@v2
         with:
           name: ${{ needs.documentation.outputs.documentation-archive-name }}
+      - name: Create documentation archive
+        id: archive-documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
+          OUTPUT_DIR: ${{ needs.documentation.outputs.documentation-archive-name }}
+        run: |
+          zip -r  documentation.zip "${OUTPUT_DIR}"
+
+          echo ::set-output name=release-path::$(realpath "./documentation.zip")
+          echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
       - name: Upload Documentation
         id: upload-documentation
         uses: actions/upload-release-asset@v1
@@ -530,6 +530,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-          asset_path: ${{ needs.documentation.outputs.documentation-archive-name }}
-          asset_name: testdoc.zip
+#          asset_path: ${{ needs.documentation.outputs.documentation-archive-name }}
+#          asset_name: testdoc.zip
+          asset_path: ${{ steps.archive-documentation.outputs.release-path }}
+          asset_name: ${{ steps.archive-documentation.outputs.release-asset-name }}
           asset_content_type: application/zip
