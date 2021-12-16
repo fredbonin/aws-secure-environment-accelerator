@@ -553,16 +553,16 @@ jobs:
     steps:
       - name: Documentation - Download Archive
         uses: actions/download-artifact@v2
-        id: documentation-download-archive
+        id: download-archive-documentation
         with:
           name: ${{ needs.build-documentation.outputs.documentation-archive-name }}
-          path: documentation-download-archive
+          path: download-archive-documentation
       - name: Documentation - Create Archive
-        id: documentation-create-archive
+        id: create-archive-documentation
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.build-documentation-download-archive.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.build-download-archive-documentation.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  documentation.zip "${OUTPUT_DIR}"
@@ -570,27 +570,27 @@ jobs:
           echo ::set-output name=release-path::$(realpath "./documentation.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-Documentation-v${NUMERIC_RELEASE_SHORT}.zip
       - name: Documentation - Upload Release Asset
-        id: documentation-upload-release-asset
+        id: upload-release-asset-documentation
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-          asset_path: ${{ steps.documentation-create-archive.outputs.release-path }}
-          asset_name: ${{ steps.documentation-create-archive.outputs.release-asset-name }}
+          asset_path: ${{ steps.create-archive-documentation.outputs.release-path }}
+          asset_name: ${{ steps.create-archive-documentation.outputs.release-asset-name }}
           asset_content_type: application/zip
       - name: SEA-GUI - Download Archive
         uses: actions/download-artifact@v2
-        id: sea-gui-download-archive
+        id: download-archive-sea-gui
         with:
           name: ${{ needs.build-sea-gui.outputs.release-asset-name }}
-          path: sea-gui-download-archive
+          path: download-archive-sea-gui
       - name: SEA-GUI - Create Archive
-        id: sea-gui-create-archive
+        id: create-archive-sea-gui
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.documentation-download-archive.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  archive.zip "${OUTPUT_DIR}"
@@ -598,43 +598,40 @@ jobs:
           echo ::set-output name=release-path::$(realpath "./archive.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-v${NUMERIC_RELEASE_SHORT}-alpha.zip
       - name: SEA-GUI - Upload Release Asset
-        id: sea-gui-upload-release-asset
+        id: upload-release-asset-sea-gui
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-          asset_path: ${{ steps.sea-gui-create-archive.outputs.release-path }}
-          asset_name: ${{ steps.sea-gui-create-archive.outputs.release-asset-name }}
+          asset_path: ${{ steps.create-archive-sea-gui.outputs.release-path }}
+          asset_name: ${{ steps.create-archive-sea-gui.outputs.release-asset-name }}
           asset_content_type: application/zip
       - name: SEA-Config-Schema - Download Archive
         uses: actions/download-artifact@v2
-        id: sea-config-schema-download-archive
+        id: download-archive-sea-config-schema
         with:
           name: ${{ needs.build-sea-config-schema.outputs.release-asset-name }}
-          path: sea-config-schema-download-archive
+          path: download-archive-sea-config-schema
       - name: SEA-GUI - Create Archive
-        id: sea-config-schema-create-archive
+        id: create-archive-sea-config-schema
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.documentation-download-archive.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.download-archive-documentation.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  archive.zip "${OUTPUT_DIR}"
 
           echo ::set-output name=release-path::$(realpath "./archive.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-v${NUMERIC_RELEASE_SHORT}-DRAFT.zip
-      - name: TODO FB DEBUG
-        run: |
-          ls -R
       - name: SEA-GUI - Upload Release Asset
-        id: sea-config-schema-upload-release-asset
+        id: upload-release-asset-sea-config-schema
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-          asset_path: ${{ steps.sea-config-schema-create-archive.outputs.release-path }}
-          asset_name: ${{ steps.sea-config-schema-create-archive.outputs.release-asset-name }}
+          asset_path: ${{ steps.create-archive-sea-config-schema.outputs.release-path }}
+          asset_name: ${{ steps.create-archive-sea-config-schema.outputs.release-asset-name }}
           asset_content_type: application/zip
