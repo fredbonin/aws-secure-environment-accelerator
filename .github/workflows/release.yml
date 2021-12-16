@@ -566,7 +566,7 @@ jobs:
           asset_content_type: application/zip
       - name: Download SEA-GUI archive
         uses: actions/download-artifact@v2
-        id: download-documentation-archive
+        id: download-sea-gui-archive
         with:
           name: ${{ needs.release-sea-gui.outputs.release-asset-name }}
           path: .
