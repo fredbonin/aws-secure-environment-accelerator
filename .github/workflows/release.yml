@@ -537,7 +537,8 @@ jobs:
     name: Upload Documentation Archive to Release Asset
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - name: Download documentation archive
+        uses: actions/download-artifact@v2
         id: download-documentation-archive
         with:
           name: ${{ needs.documentation.outputs.documentation-archive-name }}
@@ -563,6 +564,15 @@ jobs:
           asset_path: ${{ steps.archive-documentation.outputs.release-path }}
           asset_name: ${{ steps.archive-documentation.outputs.release-asset-name }}
           asset_content_type: application/zip
+      - name: Download SEA-GUI archive
+        uses: actions/download-artifact@v2
+        id: download-documentation-archive
+        with:
+          name: ${{ needs.release-sea-gui.outputs.release-asset-name }}
+          path: .
+      - name: TODO FB DEBUG
+        run: |
+          ls -R
       - name: Upload Release Asset - SEA-GUI
         id: upload-release-asset-sea-gui
         uses: actions/upload-release-asset@v1
@@ -570,6 +580,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
-          asset_path: ${{ steps.build-sea-gui.outputs.release-path }}
-          asset_name: ${{ steps.build-sea-gui.outputs.release-asset-name }}
+          asset_path: ${{ needs.release-sea-gui.outputs.release-path }}
+          asset_name: ${{ needs.release-sea-gui.outputs.release-asset-name }}
           asset_content_type: application/zip
