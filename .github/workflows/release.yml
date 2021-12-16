@@ -2,8 +2,8 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      generate-documentation-only:
-        description: 'Generate documentation only. Changing the value to false will have no impact, the documentation will still be only generated'.
+      generateDocOnly:
+        description: 'Generate documentation only. Changing the value to false will have no impact, the documentation will still be only generated'
         type: boolean
         required: false
         default: 'true'
