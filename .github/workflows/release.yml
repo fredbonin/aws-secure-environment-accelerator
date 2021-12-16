@@ -7,6 +7,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    outputs:
+      release-asset-url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -167,6 +169,8 @@ jobs:
   documentation:
     name: Render
     runs-on: ubuntu-latest
+    outputs:
+      documentation-archive-name: ${{ steps.setup.outputs.dir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -525,7 +529,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ jobs.release.steps.create_release.outputs.upload_url }}
-          asset_path: ${{ jobs.documentation.steps.setup.outputs.dir }}
+          upload_url: ${{ needs.release.outputs.release-asset-url }}
+          asset_path: ${{ needs.documentation.outputs.documentation-archive-name }}
           asset_name: testdoc.zip
           asset_content_type: application/zip
