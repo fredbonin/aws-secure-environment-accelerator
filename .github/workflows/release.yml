@@ -130,10 +130,10 @@ jobs:
           echo "Draft release available at: ${{ steps.create_release.outputs.html_url}}"
 
   build-sea-config-schema:
-    name: Build SEA-Config-Schema project
+    name: Build SEA-Config-Schema
     runs-on: ubuntu-latest
     outputs:
-      sea-gui-archive-name: ${{ steps.build.outputs.release-asset-name }}
+      release-asset-name: ${{ steps.build.outputs.release-asset-name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -169,10 +169,10 @@ jobs:
           path: ${{ steps.build.outputs.release-path }}
 
   build-sea-gui:
-    name: Create Release for ASEA GUI
+    name: Build SEA-GUI
     runs-on: ubuntu-latest
     outputs:
-      sea-gui-archive-name: ${{ steps.build.outputs.release-asset-name }}
+      release-asset-name: ${{ steps.build.outputs.release-asset-name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -207,8 +207,8 @@ jobs:
           name: ${{ steps.build.outputs.release-asset-name }}
           path: ${{ steps.build.outputs.release-path }}
 
-  documentation:
-    name: Generate Documentation
+  build-documentation:
+    name: Build Documentation
     runs-on: ubuntu-latest
     outputs:
       documentation-archive-name: ${{ steps.setup.outputs.dir }}
@@ -547,7 +547,7 @@ jobs:
   upload-archive-to-release:
     # We don't want to upload artifact to the release if the workflow was dispatched manually
     if: github.event_name != 'workflow_dispatch'
-    needs: [release, documentation, build-sea-gui, build-sea-config-schema]
+    needs: [release, build-documentation, build-sea-gui, build-sea-config-schema]
     name: Upload Archives to Release
     runs-on: ubuntu-latest
     steps:
@@ -555,14 +555,14 @@ jobs:
         uses: actions/download-artifact@v2
         id: documentation-download-archive
         with:
-          name: ${{ needs.documentation.outputs.documentation-archive-name }}
+          name: ${{ needs.build-documentation.outputs.documentation-archive-name }}
           path: documentation-download-archive
       - name: Documentation - Create Archive
         id: documentation-create-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
-          OUTPUT_DIR: ${{ steps.documentation-download-archive.outputs.download-path }}
+          OUTPUT_DIR: ${{ steps.build-documentation-download-archive.outputs.download-path }}
         run: |
           cd "${OUTPUT_DIR}"
           zip -r  documentation.zip "${OUTPUT_DIR}"
