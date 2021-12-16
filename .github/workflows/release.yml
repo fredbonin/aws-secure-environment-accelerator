@@ -124,16 +124,6 @@ jobs:
           asset_path: ${{ steps.build.outputs.template_path_code_commit }}
           asset_name: ${{ steps.build.outputs.template_name_code_commit }}
           asset_content_type: application/json
-#      - name: Upload Release Asset - SEA-Config-Schema
-#        id: upload-release-asset-sea-config-schema
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: ${{ steps.build-sea-config-schema.outputs.release-path }}
-#          asset_name: ${{ steps.build-sea-config-schema.outputs.release-asset-name }}
-#          asset_content_type: application/zip
       - name: Get Draft Release Url
         id: release_url
         run: |
@@ -178,7 +168,7 @@ jobs:
           name: ${{ steps.build.outputs.release-asset-name }}
           path: ${{ steps.build.outputs.release-path }}
 
-  release-sea-gui:
+  build-sea-gui:
     name: Create Release for ASEA GUI
     runs-on: ubuntu-latest
     outputs:
@@ -557,7 +547,7 @@ jobs:
   upload-archive-to-release:
     # We don't want to upload artifact to the release if the workflow was dispatched manually
     if: github.event_name != 'workflow_dispatch'
-    needs: [release, documentation, release-sea-gui, build-sea-config-schema]
+    needs: [release, documentation, build-sea-gui, build-sea-config-schema]
     name: Upload Archives to Release
     runs-on: ubuntu-latest
     steps:
@@ -593,7 +583,7 @@ jobs:
         uses: actions/download-artifact@v2
         id: sea-gui-download-archive
         with:
-          name: ${{ needs.release-sea-gui.outputs.release-asset-name }}
+          name: ${{ needs.build-sea-gui.outputs.release-asset-name }}
           path: sea-gui-download-archive
       - name: SEA-GUI - Create Archive
         id: sea-gui-create-archive
@@ -607,9 +597,6 @@ jobs:
 
           echo ::set-output name=release-path::$(realpath "./archive.zip")
           echo ::set-output name=release-asset-name::AWS-SEA-GUI-mockup-DoNotUse-v${NUMERIC_RELEASE_SHORT}-alpha.zip
-      - name: TODO FB DEBUG
-        run: |
-          ls -R
       - name: SEA-GUI - Upload Release Asset
         id: sea-gui-upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -619,4 +606,35 @@ jobs:
           upload_url: ${{ needs.release.outputs.release-asset-url }}
           asset_path: ${{ steps.sea-gui-create-archive.outputs.release-path }}
           asset_name: ${{ steps.sea-gui-create-archive.outputs.release-asset-name }}
+          asset_content_type: application/zip
+      - name: SEA-Config-Schema - Download Archive
+        uses: actions/download-artifact@v2
+        id: sea-config-schema-download-archive
+        with:
+          name: ${{ needs.build-sea-config-schema.outputs.release-asset-name }}
+          path: sea-config-schema-download-archive
+      - name: SEA-GUI - Create Archive
+        id: sea-config-schema-create-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMERIC_RELEASE_SHORT: ${{ needs.release.outputs.numeric-release-short }}
+          OUTPUT_DIR: ${{ steps.documentation-download-archive.outputs.download-path }}
+        run: |
+          cd "${OUTPUT_DIR}"
+          zip -r  archive.zip "${OUTPUT_DIR}"
+
+          echo ::set-output name=release-path::$(realpath "./archive.zip")
+          echo ::set-output name=release-asset-name::AWS-SEA-Config-Schema-v${NUMERIC_RELEASE_SHORT}-DRAFT.zip
+      - name: TODO FB DEBUG
+        run: |
+          ls -R
+      - name: SEA-GUI - Upload Release Asset
+        id: sea-config-schema-upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.release-asset-url }}
+          asset_path: ${{ steps.sea-config-schema-create-archive.outputs.release-path }}
+          asset_name: ${{ steps.sea-config-schema-create-archive.outputs.release-asset-name }}
           asset_content_type: application/zip
